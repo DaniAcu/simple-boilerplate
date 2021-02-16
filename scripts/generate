@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+const fs = require('fs');
+
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
+}
+
+const componentName = process.argv[2];
+
+const dashCase = /[a-z\-]+$/;
+
+if(!componentName.match(dashCase)) {
+  console.error("Format Error: Remeber to use dash case for the name like this `component-name`");
+  process.exit(1);
+}
+
+console.log("Generating files...");
+
+const componentTitle = componentName.split("-").map(toTitleCase).join("");
+
+const html = 
+`<div class="${componentName}">
+  ${componentTitle} Component!
+</div>
+`;
+
+const scss =
+`.${componentName}{
+  width: 200px;
+  height: 200px;
+  background-color: #0092aa;
+}
+`
+
+
+const js =
+`import { parsePath } from '../../config/scripts/utils'
+import template from './index.html';
+import './style.scss';
+
+class ${componentTitle} extends HTMLElement {
+  constructor() {
+      super();
+      this.innerHTML = parsePath(template, '../');
+  }
+}
+
+window.customElements.define(
+  'app-${componentName}',
+  ${componentTitle}
+);
+`
+
+const dir = `./src/components/${componentName}`;
+
+if (fs.existsSync(dir)) {
+  console.error(`Generate Error: Component ${componentName} already exist.`);
+  process.exit(1);
+}
+
+fs.mkdirSync(dir);
+
+const jsFile = `${componentName}.js`;
+
+const content = {
+  'index.html': html,
+  'style.scss': scss,
+  [jsFile]: js
+};
+
+Object.keys(content).forEach(file => fs.writeFileSync(`${dir}/${file}`, content[file]))
+
+const configContent = fs.readFileSync('./src/config/scripts/index.js').toString().split("\n");
+const newConfigContent = [...new Set([
+  `import '../../components/${componentName}/${componentName}';`,
+  ...configContent
+])].join("\n");
+
+fs.writeFile('./src/config/scripts/index.js', newConfigContent, function (err) {
+  if (err) return err;
+  console.log("Done!");
+});
