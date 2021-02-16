@@ -1,0 +1,20 @@
+{
+  "name": "simple-boilerplate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "clean": "rm dist/bundle.js",
+    "start": "parcel src/index.html --port 3000 --open",
+    "dev": "npm run start",
+    "build-prod": "parcel build src/index.html"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "sass": "^1.32.7"
+  }
+}
