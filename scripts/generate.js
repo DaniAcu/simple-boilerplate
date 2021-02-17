@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const fs = require('fs');
 
 function toTitleCase(str) {
@@ -34,26 +33,8 @@ const scss =
   width: 200px;
   height: 200px;
   background-color: #0092aa;
+  margin: 5px;
 }
-`
-
-
-const js =
-`import { parsePath } from '../../config/scripts/utils'
-import template from './index.html';
-import './style.scss';
-
-class ${componentTitle} extends HTMLElement {
-  constructor() {
-      super();
-      this.innerHTML = parsePath(template, '../');
-  }
-}
-
-window.customElements.define(
-  'app-${componentName}',
-  ${componentTitle}
-);
 `
 
 const dir = `./src/components/${componentName}`;
@@ -65,23 +46,9 @@ if (fs.existsSync(dir)) {
 
 fs.mkdirSync(dir);
 
-const jsFile = `${componentName}.js`;
-
 const content = {
   'index.html': html,
   'style.scss': scss,
-  [jsFile]: js
 };
 
 Object.keys(content).forEach(file => fs.writeFileSync(`${dir}/${file}`, content[file]))
-
-const configContent = fs.readFileSync('./src/config/scripts/index.js').toString().split("\n");
-const newConfigContent = [...new Set([
-  `import '../../components/${componentName}/${componentName}';`,
-  ...configContent
-])].join("\n");
-
-fs.writeFile('./src/config/scripts/index.js', newConfigContent, function (err) {
-  if (err) return err;
-  console.log("Done!");
-});

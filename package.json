@@ -9,9 +9,8 @@
   "scripts": {
     "clean": "rm dist/bundle.js",
     "dev": "npm run start",
-    "start": "node server.js",
-    "generate-component": "node scripts/generate",
-    "remove-component": "node scripts/remove"
+    "start": "node scripts/server.js",
+    "legos:generate": "node scripts/generate"
   },
   "dependencies": {
     "config": "^3.3.3",
